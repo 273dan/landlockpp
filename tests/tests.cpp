@@ -8,7 +8,7 @@ TEST_CASE("abi version") {
 }
 
 TEST_CASE("errata") {
-  auto errata { landlockpp::abi_version() };
+  auto errata { landlockpp::errata() };
   if( ! errata.has_value()) { INFO(errata.error()); };
   CHECK(errata.has_value());
 }
