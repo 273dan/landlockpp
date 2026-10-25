@@ -12,3 +12,5 @@ target_include_directories(${LANDLOCKPP_TESTS} PRIVATE
 )
 
 target_link_libraries(${LANDLOCKPP_TESTS} ${LIB_LANDLOCKPP})
+
+target_compile_definitions(${LANDLOCKPP_TESTS} PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
