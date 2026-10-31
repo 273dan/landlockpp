@@ -7,10 +7,13 @@
 #include <unistd.h>
 namespace landlockpp::test {
 const std::filesystem::path stage_dir { LANDLOCKPP_TEST_FILES_STAGE_DIR };
+constexpr int test_abi_ver { 8 };
+template <int version, RulesetFlags flags>
 class Runner {
 public:
   using fn_t = std::function<uint8_t(void)>;
-  Runner(Ruleset&& ruleset, fn_t fn) : fn_{fn}, ruleset_{std::move(ruleset)} {}
+  using Ruleset_t = Ruleset<version, flags>;
+  Runner(Ruleset_t&& ruleset, fn_t fn) : fn_{fn}, ruleset_{std::move(ruleset)} {}
   void set_fn(fn_t fn) { fn_ = fn; }
   fn_t::result_type run() {
     pid_t pid{fork()};
@@ -27,7 +30,7 @@ public:
   }
 private:
   fn_t fn_;
-  Ruleset ruleset_;
+  Ruleset_t ruleset_;
 };
 
 struct Stage {

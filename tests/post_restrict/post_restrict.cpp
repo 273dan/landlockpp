@@ -1,18 +1,18 @@
 #include "doctest/doctest.h"
-#include "landlockpp/bitmasks.hpp"
-#include "test_utils.hpp"
 #include "landlockpp/landlockpp.hpp"
-#include "landlockpp/ruleset.hpp"
+#include "test_utils.hpp"
 #include <fcntl.h>
 
 using namespace landlockpp;
 TEST_CASE("fs access") {
   test::Stage stage{};
-  auto ruleset_e { Ruleset::create({.fs = FsAccess::ReadFile | FsAccess::ReadDir }) };
+  auto ruleset_e { Ruleset<8, {.fs = FsAccess::All}>::create() };
   if( ! ruleset_e.has_value()) INFO("Ruleset::create: ", ruleset_e.error().message());
   REQUIRE(ruleset_e.has_value());
   auto ruleset { std::move(ruleset_e.value()) };
-  auto adp_e { ruleset.add_path(test::stage_dir / "a", FsAccess::ReadFile) };
+  auto adp_e { ruleset.add_path<FsAccess::ReadFile>(test::stage_dir / "a") };
+  if( ! adp_e.has_value()) INFO("Ruleset::add_path: ", adp_e.error().message());
+  REQUIRE(adp_e.has_value());
 
 
   auto runner { test::Runner(std::move(ruleset), []() -> int {

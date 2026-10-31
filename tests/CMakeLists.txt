@@ -1,4 +1,5 @@
 set(LANDLOCKPP_TESTS tests)
+set(LANDLOCKPP_COMPILETIME compiletime)
 
 add_executable(${LANDLOCKPP_TESTS})
 
@@ -21,5 +22,9 @@ target_compile_definitions(${LANDLOCKPP_TESTS} PRIVATE
   LANDLOCKPP_TEST_FILES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/files"
   LANDLOCKPP_TEST_FILES_STAGE_DIR="${CMAKE_CURRENT_BINARY_DIR}/stage"
 )
+
+add_executable(${LANDLOCKPP_COMPILETIME} compile_time/main.cpp)
+
+target_link_libraries(${LANDLOCKPP_COMPILETIME} ${LIB_LANDLOCKPP})
 
 
