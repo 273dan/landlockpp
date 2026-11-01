@@ -1,5 +1,5 @@
 # landlockpp
-![CI](https://github.com/273d/landlockpp/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/273dan/landlockpp/actions/workflows/ci.yml/badge.svg)
 
 **landlockpp** is an exception-free, header only C++23 wrapper for Linux Landlock v1-7
 ```cpp
