@@ -5,17 +5,29 @@ on:
     branches: [ main ]
 jobs:
   test:
-    name: Test ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Test ${{ matrix.env.os }}
+    runs-on: ${{ matrix.env.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-26.04, ubuntu-24.04, ubuntu-22.04]
+        env:
+        - os: ubuntu-26.04
+          cc: gcc
+          cxx: g++
+        - os: ubuntu-24.04
+          cc: gcc-14
+          cxx: g++-14
+        - os: ubuntu-22.02
+          cc: gcc-13
+          cxx: g++-13
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Build and run tests
+        env:
+          CC: ${{ matrix.env.cc }}
+          CXX: ${{ matrix.env.cxx }}
         run: |
           make test
 
