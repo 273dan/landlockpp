@@ -12,3 +12,8 @@ build:	config
 .PHONY: test
 test:	build
 	./build/tests/tests
+
+.PHONY: which-ver
+which-ver:  build
+	./build/which_version
+

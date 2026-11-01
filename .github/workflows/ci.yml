@@ -17,17 +17,25 @@ jobs:
         - os: ubuntu-24.04
           cc: gcc-14
           cxx: g++-14
-        - os: ubuntu-22.02
+        - os: ubuntu-22.04
           cc: gcc-13
           cxx: g++-13
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v6
 
-      - name: Build and run tests
+      - name: build
         env:
           CC: ${{ matrix.env.cc }}
           CXX: ${{ matrix.env.cxx }}
+        run: |
+          make build
+
+      - name: check landlock version
+        run: |
+          make which-ver
+          
+      - name: run tests
         run: |
           make test
 
