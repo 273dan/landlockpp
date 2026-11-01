@@ -7,7 +7,8 @@ target_sources(${LANDLOCKPP_TESTS} PRIVATE
   main.cpp
   unit/misc.cpp
   unit/rulesets.cpp
-  post_restrict/post_restrict.cpp
+  post_restrict/fs.cpp
+  post_restrict/net.cpp
 )
 
 target_include_directories(${LANDLOCKPP_TESTS} PRIVATE
@@ -23,7 +24,9 @@ target_compile_definitions(${LANDLOCKPP_TESTS} PRIVATE
   LANDLOCKPP_TEST_FILES_STAGE_DIR="${CMAKE_CURRENT_BINARY_DIR}/stage"
 )
 
-add_executable(${LANDLOCKPP_COMPILETIME} compile_time/main.cpp)
+add_library(${LANDLOCKPP_COMPILETIME} OBJECT
+  compile_time/main.cpp
+)
 
 target_link_libraries(${LANDLOCKPP_COMPILETIME} ${LIB_LANDLOCKPP})
 

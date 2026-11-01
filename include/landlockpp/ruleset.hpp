@@ -34,12 +34,12 @@ protected:
     if( ! fd.valid())
       return std::unexpected{std::error_code{errno, std::system_category()}};
 
-    landlock_path_beneath_attr attrs{
+    landlock_path_beneath_attr attr{
       .allowed_access = std::to_underlying(access),
       .parent_fd = fd.get()
     };
 
-    int ec { detail::add_rule(fd_.get(), LANDLOCK_RULE_PATH_BENEATH, &attrs, 0) };
+    int ec { detail::add_rule(fd_.get(), LANDLOCK_RULE_PATH_BENEATH, &attr, 0) };
 
     if(ec < 0)
       return std::unexpected{std::error_code{errno, std::system_category()}};
@@ -47,14 +47,31 @@ protected:
     return {};
   }
 
-  RulesetBase(int fd, RulesetFlags flags) :
-    fd_{fd},
-    fs_{flags.fs},
-    net_{flags.net},
-    scope_{flags.scope} {}
+  template <bool AssumeValidRule>
+  [[nodiscard]]
+  exp_error<void> add_net_port_impl(uint16_t port, NetAccess access)
+  const noexcept {
+    if constexpr( ! AssumeValidRule) {
+      if((access & ~net_) != NetAccess::None)
+        return std::unexpected{std::make_error_code(std::errc::invalid_argument)};
+    }
 
-  [[nodiscard]] std::expected<void, std::error_code> restrict_self_impl(bool no_new_privs = true) const noexcept {
+    landlock_net_port_attr attr{
+      .allowed_access = std::to_underlying(access),
+      .port = port
+    };
 
+    int ec { detail::add_rule(fd_.get(), LANDLOCK_RULE_NET_PORT, &attr, 0) };
+
+    if(ec < 0)
+      return std::unexpected{std::error_code{errno, std::system_category()}};
+
+    return {};
+  }
+
+  [[nodiscard]]
+  exp_error<void> restrict_self_impl(bool no_new_privs = true)
+  const noexcept {
     if(no_new_privs) {
       if(::prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) {
         return std::unexpected{std::error_code{errno, std::system_category()}};
@@ -65,6 +82,13 @@ protected:
     if( ec  < 0) return std::unexpected{std::error_code{errno, std::system_category()}};
     return {};
   }
+
+
+  RulesetBase(int fd, RulesetFlags flags) :
+    fd_{fd},
+    fs_{flags.fs},
+    net_{flags.net},
+    scope_{flags.scope} {}
 };
 
 
@@ -77,7 +101,7 @@ public:
   static exp_error<Ruleset> create()
   noexcept
   requires(detail::RulesetNotEmpty<flags>
-           && detail::RulesetSupportedByVersion<flags, version>
+        && detail::RulesetSupportedByVersion<flags, version>
   ) {
     landlock_ruleset_attr rules_attr{
       .handled_access_fs = std::to_underlying(flags.fs),
@@ -100,6 +124,14 @@ public:
   noexcept
   requires(detail::RulesetContainsFs<flags, access>) {
     return add_path_impl<true>(path, access);
+  }
+
+  template <NetAccess access>
+  [[nodiscard]]
+  exp_error<void> add_net_port(uint16_t port)
+  const noexcept
+  requires(detail::RulesetContainsNet<flags, access>) {
+    return add_net_port_impl<true>(port, access);
   }
 
   [[nodiscard]]

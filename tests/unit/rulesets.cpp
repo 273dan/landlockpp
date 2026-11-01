@@ -15,8 +15,8 @@ TEST_CASE("adding rules") {
     REQUIRE(ruleset_e.has_value());
     auto ruleset { std::move(ruleset_e.value()) };
     auto addp_e {ruleset.add_path<FsAccess::ReadFile>("/foobar/baz")};
-    INFO("add_path: ", addp_e.error().message());
     REQUIRE(addp_e.error());
+    INFO("add_path: ", addp_e.error().message());
     CHECK(addp_e.error() == std::errc::no_such_file_or_directory);
 
   }
