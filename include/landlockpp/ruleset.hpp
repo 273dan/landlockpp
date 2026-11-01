@@ -6,7 +6,6 @@
 #include <expected>
 #include <fcntl.h>
 #include <filesystem>
-#include <linux/landlock.h>
 #include <sys/prctl.h>
 #include <system_error>
 
@@ -27,12 +26,12 @@ protected:
     if( ! fd.valid())
       return std::unexpected{std::error_code{errno, std::system_category()}};
 
-    landlock_path_beneath_attr attr{
+    detail::path_beneath_attr attr{
       .allowed_access = std::to_underlying(access),
       .parent_fd = fd.get()
     };
 
-    int ec { detail::add_rule(fd_.get(), LANDLOCK_RULE_PATH_BENEATH, &attr, 0) };
+    int ec { detail::add_rule(fd_.get(), detail::RuleType::PathBeneath, &attr, 0) };
 
     if(ec < 0)
       return std::unexpected{std::error_code{errno, std::system_category()}};
@@ -44,12 +43,12 @@ protected:
   exp_error<void> add_net_port_impl(uint16_t port, NetAccess access)
   const noexcept {
 
-    landlock_net_port_attr attr{
+    detail::net_port_attr attr{
       .allowed_access = std::to_underlying(access),
       .port = port
     };
 
-    int ec { detail::add_rule(fd_.get(), LANDLOCK_RULE_NET_PORT, &attr, 0) };
+    int ec { detail::add_rule(fd_.get(), detail::RuleType::NetPort, &attr, 0) };
 
     if(ec < 0)
       return std::unexpected{std::error_code{errno, std::system_category()}};
@@ -72,7 +71,7 @@ protected:
   }
 
 
-  RulesetBase(int fd, RulesetFlags flags) : fd_{fd} {}
+  explicit RulesetBase(int fd) : fd_{fd} {}
 };
 
 
@@ -87,7 +86,7 @@ public:
   requires(detail::RulesetNotEmpty<flags>
         && detail::RulesetSupportedByVersion<flags, version>
   ) {
-    landlock_ruleset_attr rules_attr{
+    detail::ruleset_attr rules_attr{
       .handled_access_fs = std::to_underlying(flags.fs),
       .handled_access_net = std::to_underlying(flags.net),
       .scoped = std::to_underlying(flags.scope)
@@ -125,7 +124,7 @@ public:
 
 
 private:
-  Ruleset(int fd) : RulesetBase{fd, flags} {}
+  explicit Ruleset(int fd) : RulesetBase{fd} {}
 };
 
 }

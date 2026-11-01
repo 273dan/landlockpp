@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <linux/landlock.h>
 namespace landlockpp {
 
 
@@ -9,22 +8,22 @@ namespace landlockpp {
 
   enum class FsAccess : uint64_t {
     None       = 0,
-    Execute    = LANDLOCK_ACCESS_FS_EXECUTE,
-    Write      = LANDLOCK_ACCESS_FS_WRITE_FILE,
-    ReadFile   = LANDLOCK_ACCESS_FS_READ_FILE,
-    ReadDir    = LANDLOCK_ACCESS_FS_READ_DIR,
-    RemoveDir  = LANDLOCK_ACCESS_FS_REMOVE_DIR,
-    RemoveFile = LANDLOCK_ACCESS_FS_REMOVE_FILE,
-    MakeChar   = LANDLOCK_ACCESS_FS_MAKE_CHAR,
-    MakeDir    = LANDLOCK_ACCESS_FS_MAKE_DIR,
-    MakeReg    = LANDLOCK_ACCESS_FS_MAKE_REG,
-    MakeSock   = LANDLOCK_ACCESS_FS_MAKE_SOCK,
-    MakeFifo   = LANDLOCK_ACCESS_FS_MAKE_FIFO,
-    MakeBlock  = LANDLOCK_ACCESS_FS_MAKE_BLOCK,
-    MakeSym    = LANDLOCK_ACCESS_FS_MAKE_SYM,
-    Refer      = LANDLOCK_ACCESS_FS_REFER,
-    Truncate   = LANDLOCK_ACCESS_FS_TRUNCATE,
-    IoctlDev   = LANDLOCK_ACCESS_FS_IOCTL_DEV,
+    Execute    = (1ULL << 0),
+    Write      = (1ULL << 1),
+    ReadFile   = (1ULL << 2),
+    ReadDir    = (1ULL << 3),
+    RemoveDir  = (1ULL << 4),
+    RemoveFile = (1ULL << 5),
+    MakeChar   = (1ULL << 6),
+    MakeDir    = (1ULL << 7),
+    MakeReg    = (1ULL << 8),
+    MakeSock   = (1ULL << 9),
+    MakeFifo   = (1ULL << 10),
+    MakeBlock  = (1ULL << 11),
+    MakeSym    = (1ULL << 12),
+    Refer      = (1ULL << 13),
+    Truncate   = (1ULL << 14),
+    IoctlDev   = (1ULL << 15),
     LAST_,
     All        = ((LAST_ - 1) << 1) - 1
   };
@@ -34,8 +33,8 @@ namespace landlockpp {
 
   enum class NetAccess : uint64_t {
     None       = 0,
-    BindTCP    = LANDLOCK_ACCESS_NET_BIND_TCP,
-    ConnectTCP = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+    BindTCP    = (1ULL << 0),
+    ConnectTCP = (1ULL << 1),
     LAST_,
     All        = ((LAST_ - 1) << 1) - 1
   };
@@ -45,8 +44,8 @@ namespace landlockpp {
 
   enum class Scope : uint64_t {
     None               = 0,
-    AbstractUnixSocket = LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET,
-    Signal             = LANDLOCK_SCOPE_SIGNAL,
+    AbstractUnixSocket = (1ULL << 0),
+    Signal             = (1ULL << 1),
     LAST_,
     All                = ((LAST_ - 1) << 1) - 1
   };
@@ -56,9 +55,9 @@ namespace landlockpp {
   
   enum class RestrictSelf : uint32_t {
     None             = 0,
-    LogSameExecOff   = LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF,
-    LogNewExecOn     = LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON,
-    LogSubdomainsOff = LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF,
+    LogSameExecOff   = (1U << 0),
+    LogNewExecOn     = (1U << 1),
+    LogSubdomainsOff = (1U << 2),
     LAST_,
     All              = ((LAST_ - 1) << 1) - 1
     // TODO: add tsync when upgraded to abi 8
