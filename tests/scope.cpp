@@ -5,14 +5,12 @@ using namespace landlockpp;
 
 TEST_SUITE("scope") {
   TEST_CASE("scope signal") {
-    auto ruleset_e { Ruleset<8, {.scope = Scope::Signal}>::create() };
-    test::require_info("Ruleset::create", ruleset_e);
-
-    auto ruleset{std::move(ruleset_e.value())};
-
+    constexpr int test_ver { 8 };
+    constexpr RulesetFlags test_flags { .scope = Scope::Signal };
     pid_t parent_pid { ::getpid() };
+    uint8_t result { 0 };
 
-    auto runner { test::Runner{std::move(ruleset), [parent_pid]() -> uint8_t {
+    test::Runner<test_ver, test_flags> runner { [parent_pid]() -> uint8_t {
       int sig_self { ::kill(::getpid(), 0) };
       int sig_parent { ::kill(parent_pid, 0) };
 
@@ -24,13 +22,33 @@ TEST_SUITE("scope") {
 
       return rv;
 
-    }}};
+    }};
 
-    uint8_t e { runner.run() };
-    CHECK_MESSAGE((e & 1), "restrict_self was successful");
-    CHECK_MESSAGE(((e >> 1) & 1), "signalling self succeeds");
-    CHECK_MESSAGE(((e >> 2) & 1), "signalling parent fails");
-    CHECK_MESSAGE(((e >> 3) & 1), "signalling parent fails with EPERM");
+    SUBCASE("ruleset api") {
+      auto ruleset_e { Ruleset<8, {.scope = Scope::Signal}>::create() };
+      test::require_info("Ruleset::create", ruleset_e);
+
+      auto ruleset{std::move(ruleset_e.value())};
+      result = runner.run(ruleset);
+    }
+
+    SUBCASE("builder api") {
+      auto ruleset_e {
+        RulesetBuilder<test_ver, test_flags>{}
+        .build()
+      };
+      test::require_info("RulesetBuilder::build", ruleset_e);
+      auto ruleset{std::move(ruleset_e.value())};
+      result = runner.run(ruleset);
+    }
+
+
+
+
+    CHECK_MESSAGE((result & 1), "restrict_self was successful");
+    CHECK_MESSAGE(((result >> 1) & 1), "signalling self succeeds");
+    CHECK_MESSAGE(((result >> 2) & 1), "signalling parent fails");
+    CHECK_MESSAGE(((result >> 3) & 1), "signalling parent fails with EPERM");
   }
 
 }

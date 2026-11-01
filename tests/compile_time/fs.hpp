@@ -29,3 +29,25 @@ static_assert(
       FsAccess::ReadDir | FsAccess::Write>,
   "A path cannot be added when any of its ORed rules do not exist in the ruleset"
 );
+
+static_assert(
+  CanAddPath<Rules8Builder<{.fs = FsAccess::All}>, FsAccess::ReadFile>,
+  " (buidler) A path can be added when its rule exists in the ruleset"
+);
+
+static_assert(
+  CanAddPath<Rules8Builder<{.fs = FsAccess::All}>, FsAccess::ReadFile | FsAccess::Write>,
+  " (buidler) A path can be added when all of its ORed rules exist in the ruleset"
+);
+
+static_assert(
+  ! CanAddPath<Rules8Builder<{.fs = FsAccess::All}>, FsAccess::None>,
+  " (buidler) A path cannot be added when its rule is empty"
+);
+
+static_assert(
+  ! CanAddPath<
+      Rules8Builder<{.fs = FsAccess::ReadFile | FsAccess::ReadDir}>,
+      FsAccess::ReadDir | FsAccess::Write>,
+  " (buidler) A path cannot be added when any of its ORed rules do not exist in the ruleset"
+);

@@ -121,7 +121,7 @@ public:
   template <FsAccess access>
   [[nodiscard]]
   exp_error<void> add_path(const std::filesystem::path& path)
-  noexcept
+  const noexcept
   requires(detail::RulesetContainsFs<flags, access>) {
     return add_path_impl<true>(path, access);
   }

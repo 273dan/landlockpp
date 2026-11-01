@@ -30,6 +30,25 @@ static_assert(
   "A port cannot be added when its rule is empty"
 );
 
+static_assert(
+  CanAddNetPort<Rules8Builder<{.net = NetAccess::All}>, NetAccess::BindTCP>,
+  "(builder) A port can be added when its rule exists in the ruleset"
+);
+
+static_assert(
+  ! CanAddNetPort<Rules8Builder<{.net = NetAccess::ConnectTCP}>, NetAccess::BindTCP>,
+  "(builder) A port cannot be added when its rule does not exist in the ruleset"
+);
+
+static_assert(
+  CanAddNetPort<Rules8Builder<{.net = NetAccess::All}>, NetAccess::BindTCP | NetAccess::ConnectTCP>,
+  "(builder) A port can be added when all of its ORed rules exist in the ruleset"
+);
+
+static_assert(
+  ! CanAddNetPort<Rules8Builder<{.net = NetAccess::All}>, NetAccess::None>,
+  "(builder) A port cannot be added when its rule is empty"
+);
 
 
 

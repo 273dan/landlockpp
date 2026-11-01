@@ -13,17 +13,18 @@ const std::filesystem::path stage_dir { LANDLOCKPP_TEST_FILES_STAGE_DIR };
 
 constexpr int test_abi_ver { 8 };
 
+
 template <int version, RulesetFlags flags>
 class Runner {
 public:
   using fn_t = std::function<uint8_t(void)>;
   using Ruleset_t = Ruleset<version, flags>;
-  Runner(Ruleset_t&& ruleset, fn_t fn) : fn_{fn}, ruleset_{std::move(ruleset)} {}
+  Runner(fn_t fn) : fn_{fn} {}
   void set_fn(fn_t fn) { fn_ = fn; }
-  fn_t::result_type run() {
+  fn_t::result_type run(Ruleset_t& ruleset) {
     pid_t pid{fork()};
     if(pid == 0) {
-      auto exp { ruleset_.restrict_self() };
+      auto exp { ruleset.restrict_self() };
       if( ! exp.has_value()) ::_exit(0);
       uint32_t ec {fn_()};
       ::_exit(ec);
@@ -35,7 +36,6 @@ public:
   }
 private:
   fn_t fn_;
-  Ruleset_t ruleset_;
 };
 
 struct Stage {

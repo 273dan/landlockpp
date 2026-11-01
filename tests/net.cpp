@@ -11,14 +11,11 @@ using namespace landlockpp;
 TEST_SUITE("net") {
 
 TEST_CASE("net access") {
-  auto ruleset_e { Ruleset<8, {.net = NetAccess::BindTCP}>::create() };
-  test::require_info("Ruleset::create", ruleset_e);
+  constexpr int test_ver { 8 };
+  constexpr RulesetFlags test_flags { .net = NetAccess::BindTCP };
+  uint8_t result { 0 };
 
-  auto ruleset { std::move(ruleset_e.value()) };
-  auto adnp_e { ruleset.add_net_port<NetAccess::BindTCP>(0) };
-  test::require_info("Ruleset::add_net_port", adnp_e);
-
-  auto runner { test::Runner{std::move(ruleset), []() -> uint8_t {
+  test::Runner<test_ver, test_flags> runner {[]() -> uint8_t {
     detail::UniqueFd sock1_fd { ::socket(AF_INET, SOCK_STREAM, 0) };
     detail::UniqueFd sock2_fd { ::socket(AF_INET, SOCK_STREAM, 0) };
 
@@ -46,14 +43,37 @@ TEST_CASE("net access") {
     rv |= (errno2 == EACCES)    << 5; // assertion 5: ^ with EACCES
 
     return rv;
-  }}};
+  }};
 
-  uint8_t e { runner.run() };
-  CHECK_MESSAGE((e & 1),        "restrict_self was successful");
-  CHECK_MESSAGE(((e >> 1) & 1), "creating socket 1 succeeds");
-  CHECK_MESSAGE(((e >> 2) & 1), "creating socket 2 succeeds");
-  CHECK_MESSAGE(((e >> 3) & 1), "bind socket on allowed port suceeds");
-  CHECK_MESSAGE(((e >> 4) & 1), "bind socket on denied port fails");
-  CHECK_MESSAGE(((e >> 5) & 1), "bind socket on denied port fails with EACCES");
+
+  SUBCASE("ruleset api") {
+    auto ruleset_e { Ruleset<test_ver, test_flags>::create() };
+    test::require_info("Ruleset::create", ruleset_e);
+
+    auto ruleset { std::move(ruleset_e.value()) };
+    auto adnp_e { ruleset.add_net_port<NetAccess::BindTCP>(0) };
+    test::require_info("Ruleset::add_net_port", adnp_e);
+
+    result = runner.run(ruleset);
+
+  }
+
+  SUBCASE("builder api") {
+    auto ruleset_e {
+      RulesetBuilder<test_ver, test_flags>{}
+      .add_net_port<NetAccess::BindTCP>(0)
+      .build()
+    };
+    test::require_info("RulesetBuilder::build", ruleset_e);
+    auto ruleset { std::move(ruleset_e.value()) };
+    result = runner.run(ruleset);
+  }
+
+  CHECK_MESSAGE((result & 1),        "restrict_self was successful");
+  CHECK_MESSAGE(((result >> 1) & 1), "creating socket 1 succeeds");
+  CHECK_MESSAGE(((result >> 2) & 1), "creating socket 2 succeeds");
+  CHECK_MESSAGE(((result >> 3) & 1), "bind socket on allowed port suceeds");
+  CHECK_MESSAGE(((result >> 4) & 1), "bind socket on denied port fails");
+  CHECK_MESSAGE(((result >> 5) & 1), "bind socket on denied port fails with EACCES");
 }
 }

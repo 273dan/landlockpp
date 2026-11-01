@@ -9,17 +9,11 @@ TEST_SUITE("fs") {
 
 TEST_CASE("fs access") {
   test::Stage stage{};
+  constexpr int test_ver { 8 };
+  constexpr RulesetFlags test_flags { .fs = FsAccess::All };
+  uint8_t result { 0 };
 
-  auto ruleset_e { Ruleset<8, {.fs = FsAccess::All}>::create() };
-  test::require_info("Ruleset::create", ruleset_e);
-
-  auto ruleset { std::move(ruleset_e.value()) };
-
-  auto adp_e { ruleset.add_path<FsAccess::ReadFile>(test::stage_dir / "a") };
-  test::require_info("Ruleset::add_path", adp_e);
-
-
-  auto runner { test::Runner(std::move(ruleset), []() -> uint8_t {
+  test::Runner<test_ver, test_flags> runner { []() -> uint8_t {
     std::filesystem::path file_allowed { test::stage_dir / "a" / "1.txt"};
     int fd_allowed { ::open(file_allowed.c_str(), O_RDONLY)};
 
@@ -34,13 +28,35 @@ TEST_CASE("fs access") {
     rv |= (denied_errno == EACCES) << 3; // assertion 3: ^ with EACCES
     
     return rv;
-  }) };
+  } };
 
-  uint8_t e { runner.run() };
-  CHECK_MESSAGE((e & 1),        "restrict_self was successful");
-  CHECK_MESSAGE(((e >> 1) & 1), "opening allowed file succeeds");
-  CHECK_MESSAGE(((e >> 2) & 1), "opening denied file fails");
-  CHECK_MESSAGE(((e >> 3) & 1), "opening denied file fails with EACCES");
+  SUBCASE("ruleset api") {
+
+    auto ruleset_e { Ruleset<test_ver, test_flags>::create() };
+    test::require_info("Ruleset::create", ruleset_e);
+
+    auto ruleset { std::move(ruleset_e.value()) };
+
+    auto adp_e { ruleset.add_path<FsAccess::ReadFile>(test::stage_dir / "a") };
+    test::require_info("Ruleset::add_path", adp_e);
+    result = runner.run(ruleset);
+  }
+  SUBCASE("builder api") {
+    auto ruleset_e {
+      RulesetBuilder<test_ver, test_flags>{}
+      .add_path<FsAccess::ReadFile>(test::stage_dir / "a")
+      .build()
+    };
+    test::require_info("RulesetBuilder::build", ruleset_e);
+    auto ruleset { std::move(ruleset_e.value()) };
+    result = runner.run(ruleset);
+  }
+
+
+  CHECK_MESSAGE((result & 1),        "restrict_self was successful");
+  CHECK_MESSAGE(((result >> 1) & 1), "opening allowed file succeeds");
+  CHECK_MESSAGE(((result >> 2) & 1), "opening denied file fails");
+  CHECK_MESSAGE(((result >> 3) & 1), "opening denied file fails with EACCES");
   
 
 }
