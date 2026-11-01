@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+jobs:
+  test:
+    name: Test: ${{ matrix.os }}
+    runs-on: ${{ matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-26.04, ubuntu-24.04, ubuntu-22.04]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build and run tests
+        run: |
+          make test
+
