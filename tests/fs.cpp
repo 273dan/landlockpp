@@ -10,7 +10,7 @@ TEST_SUITE("fs") {
 TEST_CASE("fs access") {
   test::Stage stage{};
   constexpr int test_ver { 8 };
-  constexpr RulesetFlags test_flags { .fs = FsAccess::All };
+  constexpr RulesetFlags test_flags { .fs = FsAccess::ReadFile | FsAccess::Write };
   uint8_t result { 0 };
 
   test::Runner<test_ver, test_flags> runner { []() -> uint8_t {

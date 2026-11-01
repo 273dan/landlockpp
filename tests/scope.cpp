@@ -4,7 +4,7 @@
 using namespace landlockpp;
 
 TEST_SUITE("scope") {
-  TEST_CASE("scope signal") {
+  TEST_CASE("scope signal" * doctest::skip(abi_version().value_or(0) < 6)) {
     constexpr int test_ver { 8 };
     constexpr RulesetFlags test_flags { .scope = Scope::Signal };
     pid_t parent_pid { ::getpid() };

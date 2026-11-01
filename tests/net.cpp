@@ -10,7 +10,7 @@
 using namespace landlockpp;
 TEST_SUITE("net") {
 
-TEST_CASE("net access") {
+TEST_CASE("net access" * doctest::skip(abi_version().value_or(0) < 4)) {
   constexpr int test_ver { 8 };
   constexpr RulesetFlags test_flags { .net = NetAccess::BindTCP };
   uint8_t result { 0 };

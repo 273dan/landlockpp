@@ -7,7 +7,7 @@ TEST_CASE("abi version") {
   CHECK(version.value() >= 1);
 }
 
-TEST_CASE("errata") {
+TEST_CASE("errata" * doctest::skip(landlockpp::abi_version().value_or(0) < 7)) {
   auto errata { landlockpp::errata() };
   if( ! errata.has_value()) { INFO(errata.error()); };
   CHECK(errata.has_value());
