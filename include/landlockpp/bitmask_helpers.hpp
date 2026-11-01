@@ -43,6 +43,12 @@ namespace landlockpp {
   constexpr RestrictSelf supported_restrict_self(int abi) {
     return abi < 7 ? RestrictSelf::None : RestrictSelf::All;
   }
+
+  template <RestrictSelf f, int version>
+  concept RestrictSelfSupportedByVersion = requires() {
+      requires ((f & ~supported_restrict_self(version)) == RestrictSelf::None);
+  };
+
   }
  
 }

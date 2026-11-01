@@ -33,5 +33,6 @@ namespace landlockpp {
     concept RulesetContainsNet = requires() {
       requires (flags.net & net) == net && net != NetAccess::None;
     };
+
   }
 }

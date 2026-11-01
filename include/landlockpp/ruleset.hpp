@@ -70,7 +70,7 @@ protected:
   }
 
   [[nodiscard]]
-  exp_error<void> restrict_self_impl(bool no_new_privs = true)
+  exp_error<void> restrict_self_impl(RestrictSelf rflags, bool no_new_privs = true)
   const noexcept {
     if(no_new_privs) {
       if(::prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) {
@@ -78,7 +78,7 @@ protected:
       }
     }
 
-    int ec { detail::restrict_self(fd_.get(), 0) };
+    int ec { detail::restrict_self(fd_.get(), std::to_underlying(rflags)) };
     if( ec  < 0) return std::unexpected{std::error_code{errno, std::system_category()}};
     return {};
   }
@@ -134,10 +134,12 @@ public:
     return add_net_port_impl<true>(port, access);
   }
 
+  template <RestrictSelf rflags = RestrictSelf::None>
   [[nodiscard]]
   exp_error<void> restrict_self(bool no_new_privs = true)
-  const noexcept {
-    return restrict_self_impl(no_new_privs);
+  const noexcept
+  requires(detail::RestrictSelfSupportedByVersion<rflags, version>){
+    return restrict_self_impl(rflags, no_new_privs);
   }
 
 
