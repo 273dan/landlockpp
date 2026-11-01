@@ -11,7 +11,12 @@ set(LANDLOCKPP_WHICH_VER which_version)
 
 add_library(${LANDLOCKPP_LIB} INTERFACE)
 
-target_include_directories(${LANDLOCKPP_LIB} INTERFACE include)
+target_include_directories(${LANDLOCKPP_LIB} INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+
+
+)
 
 target_compile_features(${LANDLOCKPP_LIB} INTERFACE cxx_std_23)
 
