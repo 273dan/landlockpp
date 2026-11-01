@@ -25,8 +25,8 @@ namespace landlockpp {
     Refer      = LANDLOCK_ACCESS_FS_REFER,
     Truncate   = LANDLOCK_ACCESS_FS_TRUNCATE,
     IoctlDev   = LANDLOCK_ACCESS_FS_IOCTL_DEV,
-    _LAST,
-    All        = ((_LAST - 1) << 1) - 1
+    LAST_,
+    All        = ((LAST_ - 1) << 1) - 1
   };
 
 
@@ -36,8 +36,8 @@ namespace landlockpp {
     None       = 0,
     BindTCP    = LANDLOCK_ACCESS_NET_BIND_TCP,
     ConnectTCP = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-    _LAST,
-    All        = ((_LAST - 1) << 1) - 1
+    LAST_,
+    All        = ((LAST_ - 1) << 1) - 1
   };
 
 
@@ -47,8 +47,8 @@ namespace landlockpp {
     None               = 0,
     AbstractUnixSocket = LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET,
     Signal             = LANDLOCK_SCOPE_SIGNAL,
-    _LAST,
-    All                = ((_LAST - 1) << 1) - 1
+    LAST_,
+    All                = ((LAST_ - 1) << 1) - 1
   };
 
 
@@ -59,8 +59,8 @@ namespace landlockpp {
     LogSameExecOff   = LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF,
     LogNewExecOn     = LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON,
     LogSubdomainsOff = LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF,
-    _LAST,
-    All              = ((_LAST - 1) << 1) - 1
+    LAST_,
+    All              = ((LAST_ - 1) << 1) - 1
     // TODO: add tsync when upgraded to abi 8
   };
 

@@ -16,7 +16,7 @@ target_include_directories(${LANDLOCKPP_TESTS} PRIVATE
   ${CMAKE_SOURCE_DIR}/tests
 )
 
-target_link_libraries(${LANDLOCKPP_TESTS} ${LIB_LANDLOCKPP})
+target_link_libraries(${LANDLOCKPP_TESTS} ${LANDLOCKPP_LIB})
 
 target_compile_definitions(${LANDLOCKPP_TESTS} PRIVATE
   DOCTEST_CONFIG_USE_STD_HEADERS
@@ -28,6 +28,6 @@ add_library(${LANDLOCKPP_COMPILETIME} OBJECT
   compile_time/main.cpp
 )
 
-target_link_libraries(${LANDLOCKPP_COMPILETIME} ${LIB_LANDLOCKPP})
+target_link_libraries(${LANDLOCKPP_COMPILETIME} ${LANDLOCKPP_LIB})
 
 

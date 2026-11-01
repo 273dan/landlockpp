@@ -9,26 +9,19 @@
 #include <linux/landlock.h>
 #include <sys/prctl.h>
 #include <system_error>
+
 namespace landlockpp {
-  template <typename T>
-  using exp_error = std::expected<T, std::error_code>;
+
+template <typename T>
+using exp_error = std::expected<T, std::error_code>;
 
 struct RulesetBase {
 protected:
   detail::UniqueFd fd_;
-  FsAccess fs_;
-  NetAccess net_;
-  Scope scope_;
 
-  template <bool AssumeValidRule>
   [[nodiscard]]
   exp_error<void> add_path_impl(const std::filesystem::path& path, FsAccess access)
   const noexcept {
-
-    if constexpr( ! AssumeValidRule) {
-      if((access & ~fs_) != FsAccess::None)
-        return std::unexpected{std::make_error_code(std::errc::invalid_argument)};
-    }
 
     detail::UniqueFd fd{ ::open(path.c_str(), O_PATH | O_CLOEXEC) };
     if( ! fd.valid())
@@ -47,14 +40,9 @@ protected:
     return {};
   }
 
-  template <bool AssumeValidRule>
   [[nodiscard]]
   exp_error<void> add_net_port_impl(uint16_t port, NetAccess access)
   const noexcept {
-    if constexpr( ! AssumeValidRule) {
-      if((access & ~net_) != NetAccess::None)
-        return std::unexpected{std::make_error_code(std::errc::invalid_argument)};
-    }
 
     landlock_net_port_attr attr{
       .allowed_access = std::to_underlying(access),
@@ -84,11 +72,7 @@ protected:
   }
 
 
-  RulesetBase(int fd, RulesetFlags flags) :
-    fd_{fd},
-    fs_{flags.fs},
-    net_{flags.net},
-    scope_{flags.scope} {}
+  RulesetBase(int fd, RulesetFlags flags) : fd_{fd} {}
 };
 
 
@@ -115,15 +99,12 @@ public:
     return Ruleset{fd};
   }
 
-  /**
-   *
-   */
   template <FsAccess access>
   [[nodiscard]]
   exp_error<void> add_path(const std::filesystem::path& path)
   const noexcept
   requires(detail::RulesetContainsFs<flags, access>) {
-    return add_path_impl<true>(path, access);
+    return add_path_impl(path, access);
   }
 
   template <NetAccess access>
@@ -131,7 +112,7 @@ public:
   exp_error<void> add_net_port(uint16_t port)
   const noexcept
   requires(detail::RulesetContainsNet<flags, access>) {
-    return add_net_port_impl<true>(port, access);
+    return add_net_port_impl(port, access);
   }
 
   template <RestrictSelf rflags = RestrictSelf::None>
