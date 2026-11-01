@@ -1,5 +1,5 @@
 # landlockpp
-**landlockpp** is an execption-free, header only C++23 wrapper for Linux Landlock v1-7
+**landlockpp** is an exception-free, header only C++23 wrapper for Linux Landlock v1-7
 ```cpp
 #include "landlockpp/landlockpp.hpp"
 using namespace landlockpp;
@@ -11,7 +11,6 @@ auto ruleset {
 };
 if(ruleset.has_value()) {
     ruleset->restrict_self();
-}
 }
 ```
 ## Features
