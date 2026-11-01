@@ -18,7 +18,7 @@ TEST_CASE("net access") {
   auto adnp_e { ruleset.add_net_port<NetAccess::BindTCP>(0) };
   test::require_info("Ruleset::add_net_port", adnp_e);
 
-  auto runner { test::Runner(std::move(ruleset), []() -> uint8_t {
+  auto runner { test::Runner{std::move(ruleset), []() -> uint8_t {
     detail::UniqueFd sock1_fd { ::socket(AF_INET, SOCK_STREAM, 0) };
     detail::UniqueFd sock2_fd { ::socket(AF_INET, SOCK_STREAM, 0) };
 
@@ -46,7 +46,7 @@ TEST_CASE("net access") {
     rv |= (errno2 == EACCES)    << 5; // assertion 5: ^ with EACCES
 
     return rv;
-  })};
+  }}};
 
   uint8_t e { runner.run() };
   CHECK_MESSAGE((e & 1),        "restrict_self was successful");

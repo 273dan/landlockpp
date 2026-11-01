@@ -33,10 +33,5 @@ namespace landlockpp {
     concept RulesetContainsNet = requires() {
       requires (flags.net & net) == net && net != NetAccess::None;
     };
-
-    template <RulesetFlags flags, Scope scope>
-    concept RulesetContainsScope = requires() {
-      requires (flags.scope & scope) == scope && scope != Scope::None;
-    };
   }
 }

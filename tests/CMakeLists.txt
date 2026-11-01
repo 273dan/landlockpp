@@ -8,6 +8,7 @@ target_sources(${LANDLOCKPP_TESTS} PRIVATE
   fs.cpp
   main.cpp
   net.cpp
+  scope.cpp
 )
 
 target_include_directories(${LANDLOCKPP_TESTS} PRIVATE
