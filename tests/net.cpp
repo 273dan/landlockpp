@@ -8,15 +8,15 @@
 #include <netinet/in.h>
 
 using namespace landlockpp;
+TEST_SUITE("net") {
+
 TEST_CASE("net access") {
   auto ruleset_e { Ruleset<8, {.net = NetAccess::BindTCP}>::create() };
-  if( ! ruleset_e.has_value()) INFO("Ruleset::create: ", ruleset_e.error().message());
-  REQUIRE(ruleset_e.has_value());
+  test::require_info("Ruleset::create", ruleset_e);
 
   auto ruleset { std::move(ruleset_e.value()) };
   auto adnp_e { ruleset.add_net_port<NetAccess::BindTCP>(0) };
-  if( ! adnp_e.has_value()) INFO("Ruleset::add_path: ", adnp_e.error().message());
-  REQUIRE(adnp_e.has_value());
+  test::require_info("Ruleset::add_net_port", adnp_e);
 
   auto runner { test::Runner(std::move(ruleset), []() -> uint8_t {
     detail::UniqueFd sock1_fd { ::socket(AF_INET, SOCK_STREAM, 0) };
@@ -55,14 +55,5 @@ TEST_CASE("net access") {
   CHECK_MESSAGE(((e >> 3) & 1), "bind socket on allowed port suceeds");
   CHECK_MESSAGE(((e >> 4) & 1), "bind socket on denied port fails");
   CHECK_MESSAGE(((e >> 5) & 1), "bind socket on denied port fails with EACCES");
-
-
-
-
-
-
-
-
-
-
+}
 }

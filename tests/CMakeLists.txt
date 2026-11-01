@@ -4,11 +4,10 @@ set(LANDLOCKPP_COMPILETIME compiletime)
 add_executable(${LANDLOCKPP_TESTS})
 
 target_sources(${LANDLOCKPP_TESTS} PRIVATE
+  abi.cpp
+  fs.cpp
   main.cpp
-  unit/misc.cpp
-  unit/rulesets.cpp
-  post_restrict/fs.cpp
-  post_restrict/net.cpp
+  net.cpp
 )
 
 target_include_directories(${LANDLOCKPP_TESTS} PRIVATE

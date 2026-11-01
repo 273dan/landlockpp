@@ -21,3 +21,4 @@ static_assert(
   ! CanCreate<Ruleset<0, {.fs = FsAccess::ReadFile}>>,
   "A ruleset cannot be created with version <= 0"
 );
+

@@ -5,9 +5,14 @@
 #include <functional>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "doctest/doctest.h"
 namespace landlockpp::test {
+
+const std::filesystem::path files_dir { LANDLOCKPP_TEST_FILES_DIR };
 const std::filesystem::path stage_dir { LANDLOCKPP_TEST_FILES_STAGE_DIR };
+
 constexpr int test_abi_ver { 8 };
+
 template <int version, RulesetFlags flags>
 class Runner {
 public:
@@ -36,15 +41,26 @@ private:
 struct Stage {
   Stage() {
     std::filesystem::copy(
-      LANDLOCKPP_TEST_FILES_DIR,
-      LANDLOCKPP_TEST_FILES_STAGE_DIR,
-      std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing
+      files_dir,
+      stage_dir,
+      std::filesystem::copy_options::recursive
+      | std::filesystem::copy_options::overwrite_existing
     );
   }
 
   ~Stage() {
-    std::filesystem::remove_all(LANDLOCKPP_TEST_FILES_STAGE_DIR);
+    std::filesystem::remove_all(stage_dir);
   }
 };
+
+template <typename T>
+inline void require_info(std::string_view source, std::expected<T, std::error_code>& e) {
+  if( ! e.has_value() ) {
+    FAIL(source, ": ", e.error().message());
+  }
+    
+}
+
+
 
 }
