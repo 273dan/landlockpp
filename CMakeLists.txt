@@ -1,21 +1,23 @@
 cmake_minimum_required(VERSION 3.21)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 project(landlockpp)
+
+if(PROJECT_IS_TOP_LEVEL)
+    set(CMAKE_CXX_STANDARD 23)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
+
 
 set(LANDLOCKPP_LIB landlockpp)
 set(LANDLOCKPP_WHICH_VER which_version)
 
 add_library(${LANDLOCKPP_LIB} INTERFACE)
+add_library(landlockpp::landlockpp ALIAS ${LANDLOCKPP_LIB})
 
 target_include_directories(${LANDLOCKPP_LIB} INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
-
-
 )
 
 target_compile_features(${LANDLOCKPP_LIB} INTERFACE cxx_std_23)
@@ -31,3 +33,6 @@ if(${LANDLOCKPP_ENABLE_WHICH_VER})
   add_executable(${LANDLOCKPP_WHICH_VER} which_version/which_version.cpp)
   target_link_libraries(${LANDLOCKPP_WHICH_VER} ${LANDLOCKPP_LIB})
 endif()
+
+
+

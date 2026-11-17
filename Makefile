@@ -17,3 +17,6 @@ test:	build
 which-ver:  build
 	./build/which_version
 
+.PHONY: clean
+clean:
+	rm -rf build
